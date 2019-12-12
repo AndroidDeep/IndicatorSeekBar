@@ -64,6 +64,7 @@ public class Builder {
     boolean showTickText;
     int tickTextsColor = Color.parseColor("#FF4081");
     int tickTextsSize = 0;
+    int tickTextMargin = 0;
     String[] tickTextsCustomArray = null;
     Typeface tickTextsTypeFace = Typeface.DEFAULT;
     ColorStateList tickTextsColorStateList = null;
@@ -84,6 +85,7 @@ public class Builder {
         this.trackProgressSize = SizeUtils.dp2px(context, 2);
         this.tickMarksSize = SizeUtils.dp2px(context, 10);
         this.tickTextsSize = SizeUtils.sp2px(context, 13);
+        this.tickTextMargin = SizeUtils.dp2px(context,3);
         this.thumbSize = SizeUtils.dp2px(context, 14);
     }
 

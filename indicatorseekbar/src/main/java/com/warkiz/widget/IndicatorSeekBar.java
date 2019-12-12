@@ -21,6 +21,7 @@ import android.support.annotation.RequiresApi;
 import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewParent;
@@ -92,6 +93,7 @@ public class IndicatorSeekBar extends View {
     private float[] mTextCenterX;//the text's drawing X anchor
     private float mTickTextY;//the text's drawing Y anchor
     private int mTickTextsSize;
+    private int mTickTextMargin;
     private Typeface mTextsTypeface;//the tick texts and thumb texts' typeface
     private int mSelectedTextsColor;//the color for the tick texts those thumb swept.
     private int mUnselectedTextsColor;//the color for the tick texts those thumb haven't reach.
@@ -226,6 +228,7 @@ public class IndicatorSeekBar extends View {
         //tickTexts
         mShowTickText = ta.getBoolean(R.styleable.IndicatorSeekBar_isb_show_tick_texts, builder.showTickText);
         mTickTextsSize = ta.getDimensionPixelSize(R.styleable.IndicatorSeekBar_isb_tick_texts_size, builder.tickTextsSize);
+        mTickTextMargin = ta.getDimensionPixelSize(R.styleable.IndicatorSeekBar_isb_tick_texts_margin, builder.tickTextMargin);
         initTickTextsColor(ta.getColorStateList(R.styleable.IndicatorSeekBar_isb_tick_texts_color), builder.tickTextsColor);
         mTickTextsCustomArray = ta.getTextArray(R.styleable.IndicatorSeekBar_isb_tick_texts_array);
         initTextsTypeface(ta.getInt(R.styleable.IndicatorSeekBar_isb_tick_texts_typeface, -1), builder.tickTextsTypeFace);
@@ -359,7 +362,7 @@ public class IndicatorSeekBar extends View {
     protected void onMeasure(int widthMeasureSpec, int heightMeasureSpec) {
         super.onMeasure(widthMeasureSpec, heightMeasureSpec);
         int height = Math.round(mCustomDrawableMaxHeight + getPaddingTop() + getPaddingBottom());
-        setMeasuredDimension(resolveSize(SizeUtils.dp2px(mContext, 170), widthMeasureSpec), height + mTickTextsHeight);
+        setMeasuredDimension(resolveSize(SizeUtils.dp2px(mContext, 170), widthMeasureSpec), height + mTickTextsHeight + mTickTextMargin);
         initSeekBarInfo();
         refreshSeekBarLocation();
     }
@@ -383,7 +386,7 @@ public class IndicatorSeekBar extends View {
         //init TickTexts Y Location
         if (needDrawText()) {
             mTextPaint.getTextBounds("j", 0, 1, mRect);
-            mTickTextY = mPaddingTop + mCustomDrawableMaxHeight + Math.round(mRect.height() - mTextPaint.descent()) + SizeUtils.dp2px(mContext, 3);
+            mTickTextY = mPaddingTop + mCustomDrawableMaxHeight + Math.round(mRect.height() - mTextPaint.descent()) + mTickTextMargin;
             mThumbTextY = mTickTextY;
         }
         //init tick's X and text's X location;
@@ -596,13 +599,7 @@ public class IndicatorSeekBar extends View {
             if (mR2L) {
                 index = mTickTextsArr.length - i - 1;
             }
-            if (i == 0) {
-                canvas.drawText(mTickTextsArr[index], mTextCenterX[i] + mTickTextsWidth[index] / 2.0f, mTickTextY, mTextPaint);
-            } else if (i == mTickTextsArr.length - 1) {
-                canvas.drawText(mTickTextsArr[index], mTextCenterX[i] - mTickTextsWidth[index] / 2.0f, mTickTextY, mTextPaint);
-            } else {
-                canvas.drawText(mTickTextsArr[index], mTextCenterX[i], mTickTextY, mTextPaint);
-            }
+            canvas.drawText(mTickTextsArr[index], mTextCenterX[i], mTickTextY, mTextPaint);
         }
     }
 
@@ -1202,6 +1199,7 @@ public class IndicatorSeekBar extends View {
         if (!mUserSeekable || !isEnabled()) {
             return false;
         }
+        Log.e("seekBar",String.valueOf(event.getAction()));
         switch (event.getAction()) {
             case MotionEvent.ACTION_DOWN:
                 performClick();
@@ -1303,6 +1301,12 @@ public class IndicatorSeekBar extends View {
             rawTouchX = mProgressTrack.right;
         }
         return rawTouchX - mThumbSize / 2f <= mX && mX <= rawTouchX + mThumbSize / 2f;
+    }
+
+    private boolean isTouchTick(float mX){
+        float tickDivideSize = (mMeasuredWidth - mPaddingRight - mPaddingLeft) / (mTicksCount - 1f);
+        float  distance = (mX - mPaddingLeft) % tickDivideSize;
+        return Math.min(distance,tickDivideSize - distance) <= (mThumbSize / 2f);
     }
 
     private void updateIndicator() {

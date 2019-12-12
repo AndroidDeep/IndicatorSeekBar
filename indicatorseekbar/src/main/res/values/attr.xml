@@ -56,6 +56,7 @@
         <attr name="isb_tick_texts_color" format="reference|color" /><!--set texts' color, default #FF4081-->
         <attr name="isb_tick_texts_size" format="dimension|reference" /><!--set the text size of tick below text, default 13sp-->
         <attr name="isb_tick_texts_array" format="reference" /><!--set the custom texts below tick to replace default progress text, default null-->
+        <attr name="isb_tick_texts_margin" format="dimension|reference"/>
         <attr name="isb_tick_texts_typeface"><!--select the typeface for tick texts/thumb text, default normal-->
             <enum name="normal" value="0" />
             <enum name="monospace" value="1" />
